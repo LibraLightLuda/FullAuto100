@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FullAuto100</title>
+<style>
+  :root {
+    /* The toolbar sizes the popup from its content before the viewport has its final width. */
+    width: 420px;
+    color-scheme: dark;
+    font: 15px/1.5 system-ui, sans-serif;
+    color: #eef3ff;
+    background: #101426;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; padding: 20px; word-break: keep-all; overflow-wrap: anywhere; }
+  h1, h2, p { margin: 0; }
+  header, .row, .card-head, .actions { display: flex; align-items: center; gap: 10px; }
+  header, .row { justify-content: space-between; }
+  h1 { font-size: 23px; letter-spacing: -.6px; }
+  h2 { font-size: 15px; }
+  .hint, small { color: #aab6d1; font-size: 13px; }
+  .badge { flex: none; white-space: nowrap; border-radius: 20px; padding: 4px 10px; background: #283149; color: #e0e8fa; font-size: 13px; font-weight: 750; }
+  .badge[data-status="running"] { background: #332e58; color: #d9ccff; }
+  .badge[data-status="complete"] { background: #173f37; color: #9ef8d8; }
+  .badge[data-status="error"], .badge[data-status="partial"] { background: #503127; color: #ffcfab; }
+  .cards { display: grid; gap: 8px; margin: 16px 0; }
+  .card, .option { border: 1px solid #323a57; border-radius: 12px; background: #1b2238; padding: 12px; }
+  .card[data-active="true"] { border-color: #9281ed; }
+  .step { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: #333056; color: #ded4ff; font-size: 12px; font-weight: 750; }
+  .count { flex: none; color: #f0edff; font: 750 16px/1 system-ui; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  progress { display: block; width: 100%; height: 9px; margin: 10px 0 5px; appearance: none; border: 0; border-radius: 9px; background: #303957; overflow: hidden; }
+  progress::-webkit-progress-bar { background: #303957; }
+  progress::-webkit-progress-value { border-radius: 9px; background: linear-gradient(90deg, #9985fa, #c7b6ff); transition: width .25s ease; }
+  #draw-bar::-webkit-progress-value { background: linear-gradient(90deg, #53c8bf, #90f0ce); }
+  .option { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 8px; cursor: pointer; }
+  .option input { margin: 4px 0 0; accent-color: #b6a4ff; }
+  .option small { grid-column: 2; }
+  .actions { margin-top: 12px; }
+  button { border: 1px solid transparent; border-radius: 9px; padding: 9px 12px; font: inherit; font-weight: 750; cursor: pointer; }
+  button:focus-visible, input:focus-visible { outline: 2px solid #bfaeff; outline-offset: 3px; }
+  button:disabled { opacity: .54; cursor: default; }
+  #start { flex: 1; color: #191333; background: #c3b3ff; }
+  #stop, #open-logs, #update { color: #eaf0ff; background: #2e3751; border-color: #48536e; }
+  .update-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; }
+  #notice { margin-top: 9px; color: #ffcfab; overflow-wrap: anywhere; }
+  footer { margin-top: 9px; }
+  .complete-window > :not(#completion) { display: none; }
+  #completion h1 { margin: 8px 0; }
+  #completion .hint { margin-bottom: 14px; }
+  #close-completion { color: #102c25; background: #9ef8d8; }
+  @media (prefers-reduced-motion: reduce) { progress::-webkit-progress-value { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div><h1>FullAuto100</h1><p class="hint">미션 보상 · 100 플레이크 뽑기</p></div>
+  <span class="badge" id="status" role="status">대기</span>
+</header>
+<main class="cards" aria-label="자동 처리 진행률">
+  <section class="card" id="mission-card">
+    <div class="row"><div class="card-head"><span class="step" aria-hidden="true">1</span><h2 id="mission-title">미션 보상</h2></div><span class="count" id="mission-count">—</span></div>
+    <progress id="mission-bar" aria-labelledby="mission-title" value="0"></progress>
+    <p class="hint" id="mission-note">수령할 항목 확인 대기</p>
+  </section>
+  <section class="card" id="draw-card">
+    <div class="row"><div class="card-head"><span class="step" aria-hidden="true">2</span><h2 id="draw-title">캡슐 뽑기</h2></div><span class="count" id="draw-count">—</span></div>
+    <progress id="draw-bar" aria-labelledby="draw-title" value="0"></progress>
+    <p class="hint" id="draw-note">미션 처리 후 시작</p>
+  </section>
+</main>
+<label class="option">
+  <input id="enter-stove-points" type="checkbox">
+  <strong>스토브 포인트 경품에 1회 응모</strong>
+  <small>미완료 경품 미션에서 가장 큰 포인트 경품에 응모합니다. 1회 비용만큼 플레이크가 사용됩니다.</small>
+</label>
+<div class="actions"><button id="start">자동 처리 시작</button><button id="stop" disabled>중지</button><button id="open-logs">로그 폴더 열기</button></div>
+<p id="notice" role="alert" hidden></p>
+<div class="update-row"><span class="hint" id="update-note" role="status">버전 확인 중…</span><button id="update">업데이트 확인</button></div>
+<footer class="hint">시작 전 F12를 닫고, 실행 중 작업 탭을 열어 두세요.</footer>
+<section id="completion" hidden>
+  <span class="badge" data-status="complete">완료 ✓</span>
+  <h1>오늘 자동 처리가 끝났습니다</h1>
+  <p class="hint">처리 대상 미션과 오늘의 캡슐 뽑기 30회, 받을 수 있는 누적 보상 확인을 마쳤습니다.</p>
+  <button id="close-completion">닫기</button>
+</section>
+<script src="popup.js"></script>
+</body>
+</html>

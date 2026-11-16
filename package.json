@@ -1,0 +1,11 @@
+{
+  "name": "fullauto100",
+  "version": "5.7.0",
+  "private": true,
+  "scripts": {
+    "build": "node outputs/stove100-build.cjs",
+    "test": "node outputs/stove-100.test.cjs && node outputs/stove-100.startup-race.test.cjs && node outputs/stove100-auto-open.test.cjs && node outputs/stove100-update.test.cjs",
+    "test:browser": "node outputs/stove-100.missions.test.js && node outputs/stove-100.audit-repro.cjs && node outputs/stove100-background.test.cjs && node outputs/stove100-prize.test.cjs"
+  },
+  "devDependencies": { "playwright": "1.64.1" }
+}

@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "FullAuto100 백그라운드 실행",
+  "version": "5.7.0",
+  "minimum_chrome_version": "118",
+  "description": "스토브 100 플레이크 뽑기와 미션을 응답 확인 후 순서대로 처리합니다.",
+  "permissions": [
+    "debugger",
+    "webNavigation",
+    "storage",
+    "downloads",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://reward.onstove.com/*",
+    "https://api.github.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "FullAuto100"
+  }
+}

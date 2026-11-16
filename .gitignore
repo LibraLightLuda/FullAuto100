@@ -1,0 +1,12 @@
+node_modules/
+outputs/test-runtime/
+outputs/*.exe
+outputs/*.zip
+outputs/*.result.json
+outputs/*.test.html
+outputs/*.audit-repro.html
+*.log
+dist/
+*.previous/
+*.staging-*/
+*.setup.lock
